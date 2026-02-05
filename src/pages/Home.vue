@@ -32,9 +32,7 @@
 
     const countChars = computed(() => {
         return 240 - post.value.length
-    })
-
-    
+    })    
 
     onMounted(() => {
         message.value = 'My page has loaded'
