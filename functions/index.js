@@ -10,6 +10,12 @@
 const {setGlobalOptions} = require("firebase-functions");
 const {onRequest} = require("firebase-functions/https");
 const logger = require("firebase-functions/logger");
+const { initializeApp } = require("firebase-admin/app");
+const { getFirestore } = require("firebase-admin/firestore");
+initializeApp();
+
+const db = getFirestore();
+
 
 // For cost control, you can set the maximum number of containers that can be
 // running at the same time. This helps mitigate the impact of unexpected
@@ -30,3 +36,34 @@ setGlobalOptions({ maxInstances: 10 });
    logger.info("Hello logs!", {structuredData: true});
    response.send({"likes" : "3122828"});
  });
+
+exports.postcomment = onRequest(async (request, response) => {
+  logger.info("Posting comments made from client requests", { structuredData: true });
+
+  // Save the data in our Firestore DB
+  const res = await db.collection('comments').add(request.body);
+  // If successful a document id will be returned 
+  if (res.id) {
+    console.log('Document added with ID:', res.id);
+    response.send('Operation successful: Document added.');
+  } else {
+    console.error('Failed to add the document.');
+    response.send('Operation failed: Document not added.');
+  }
+});
+
+exports.getAllComments = onRequest(async (request, response) => {
+
+  logger.info("Retrieving all comments made in the DB", { structuredData: true });
+  // Save the data in our Firestore DB
+  const snapshot = await db.collection('comments').get();
+  if (snapshot.empty) {
+    console.log('No matching documents.');
+    response.send('No documents found in the collection');
+  }
+  let myComments = [];
+  snapshot.forEach(doc => {
+    myComments.push(doc.data())
+  });
+  response.json(myComments);
+});

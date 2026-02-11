@@ -1,5 +1,6 @@
 <script setup>
     import Nav from '@/components/Nav.vue'
+
 </script>
 <template>
     <Nav />
@@ -18,6 +19,7 @@
 
         <a href="https://www.google.ie">The best engine</a>
         <button class="btn btn-primary">My button</button>
+        
     </div>
 </template>
 
