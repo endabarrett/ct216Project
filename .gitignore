@@ -38,4 +38,4 @@ __screenshots__/
 .firebase/*
 .firebaserc
 firebase.json
-/src/config/*
+/src/api/*

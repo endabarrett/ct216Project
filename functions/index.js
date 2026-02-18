@@ -8,7 +8,7 @@
  */
 
 const {setGlobalOptions} = require("firebase-functions");
-const {onRequest} = require("firebase-functions/https");
+const {onCall, onRequest} = require("firebase-functions/https");
 const logger = require("firebase-functions/logger");
 const { initializeApp } = require("firebase-admin/app");
 const { getFirestore } = require("firebase-admin/firestore");
@@ -37,7 +37,7 @@ setGlobalOptions({ maxInstances: 10 });
    response.send({"likes" : "3122828"});
  });
 
-exports.postcomment = onRequest(async (request, response) => {
+/*exports.postcomment = onRequest(async (request, response) => {
   logger.info("Posting comments made from client requests", { structuredData: true });
 
   // Save the data in our Firestore DB
@@ -50,20 +50,49 @@ exports.postcomment = onRequest(async (request, response) => {
     console.error('Failed to add the document.');
     response.send('Operation failed: Document not added.');
   }
+});*/
+
+exports.postcomment = onCall(async (data, context) => {
+  try {
+    const { handle, comment } = data.data; logger.info("Received a comment post request", { handle, comment });
+    if (!handle || !comment) {
+      throw new Error('Missing handle or comment in request data.');
+    }// Save the data in Firestore
+    const res = await db.collection('comments').add({ handle, comment }); logger.info('Document added with ID:', res.id);
+    // Return a success response
+    return { success: true, message: 'Document added successfully.', documentId: res.id };
+  } catch (error) {
+    logger.error('Error adding comment:', error);
+    // Return an error response
+    return { success: false, message: 'Failed to add comment.', error: error.message };
+  }
 });
 
-exports.getAllComments = onRequest(async (request, response) => {
 
-  logger.info("Retrieving all comments made in the DB", { structuredData: true });
-  // Save the data in our Firestore DB
-  const snapshot = await db.collection('comments').get();
-  if (snapshot.empty) {
-    console.log('No matching documents.');
-    response.send('No documents found in the collection');
+
+
+exports.getAllComments = onCall(async (data, context) => {
+
+  try {
+    // Query Firestore for the comments collection
+    const snapshot = await db.collection('comments').get();
+    // Check if the collection has any documents
+    if (snapshot.empty) {
+      return { success: false, message: 'No comments found.' };
+    }// Create an array to store the comments
+    const comments = [];// Use forEach to populate the comments array
+    snapshot.docs.forEach(doc => {
+      comments.push({
+        id: doc.id,
+        ...doc.data(),
+      });
+    });// Return the retrieved comments
+    return { success: true, comments };
+  } catch (error) {
+    console.error('Error retrieving comments:', error);
+    // Return an error response
+    return { success: false, message: 'Failed to retrieve comments.', error: error.message };
   }
-  let myComments = [];
-  snapshot.forEach(doc => {
-    myComments.push(doc.data())
-  });
-  response.json(myComments);
+
+
 });
