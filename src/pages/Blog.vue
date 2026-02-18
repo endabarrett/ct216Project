@@ -24,7 +24,7 @@
 
     const getComments = async () => {
         const functions = getFunctions(app);
-        const getComments = httpsCallable(functions, 'getComments');
+        const getComments = httpsCallable(functions, 'getAllComments');
         const result = await getComments();
 
         comments.value = result.data.comments;
