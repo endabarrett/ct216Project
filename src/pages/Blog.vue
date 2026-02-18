@@ -1,36 +1,38 @@
 <script setup>
     import Nav from '@/components/Nav.vue'
+    import {ref} from 'vue'
+
+    const handle = ref('')
+    const comment = ref('')
+
+    const postComment = () => {
+        console.log("handle", handle.value);
+        console.log("comment", comment.value);
+    }
+
 
 </script>
 <template>
     <Nav />
-    <div class="container">
-        <div class="row">
-            <div class="col-md-6">
-                First
+        <div class="container">
+            <h1>Welcome to my blog page</h1>
+            <p>This is my blog page for my SaaS app</p>
+            <div class="mb-3">
+                <label for="exampleFormControlInput1" class="form-label">Email address</label>
+                 <input
+                    type="email" v-model="handle" class="form-control" id="exampleFormControlInput1" placeholder="name@example.com">
+            </div> 
+            <div class="mb-3"> 
+                <label for="exampleFormControlTextarea1" class="form-label">Comment</label>
+            
+                <textarea class="form-control" v-model="comment" id="exampleFormControlTextarea1" rows="3"></textarea> 
             </div>
-            <div class="col-md-6">
-                Second
+            <div class="mb-3 right"> 
+                <button type="button" @click="postComment" class="btn btn-primary">Post</button> 
             </div>
-        </div>    
-        <h1>This is my Blog page</h1>
-    
-        <p id="welcome" class="myBlueClass">Welcome to my wonderful blog page</p>
-
-        <a href="https://www.google.ie">The best engine</a>
-        <button class="btn btn-primary">My button</button>
-        
-    </div>
+        </div>
 </template>
 
 <style scoped>
-.myBlueClass {
-    color:lightblue
-}
-a {
-    color:green
-}
-#welcome {
-    text-align: center;
-}
+
 </style>
