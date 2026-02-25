@@ -68,10 +68,32 @@ exports.postcomment = onCall(async (data, context) => {
   }
 });
 
+exports.deleteComment = onCall(async (data, context) => {
+  try {
+    const { id } = data.data;
+    logger.info("Received a delete comment request", { id });
+    if (!id) {
+      throw new Error('Missing document id request data.');
+    }
+    // Delete the document in Firestore
+    const res = await db.collection('comments').doc(id).delete();
+    // Return a success response
+    return {
+      success: true,
+      message: 'Document deleted successfully.'
+    };
+  } catch (error) {
+    logger.error('Error deleting comment:', error);
+    // Return an error response
+    return {
+      success: false,
+      message: 'Failed to delete comment.',
+      error: error.message,
+    };
+  }
+});
 
-
-
-exports.getAllComments = onCall(async (data, context) => {
+exports.getComments = onCall(async (data, context) => {
 
   try {
     // Query Firestore for the comments collection
@@ -96,3 +118,29 @@ exports.getAllComments = onCall(async (data, context) => {
 
 
 });
+
+exports.updateComment = onCall(async (data, context) => {
+  try {
+    const { id, comment } = data.data;
+    logger.info("Received a comment update request", { comment });
+    if (!comment) {
+      throw new Error('Missing comment in request data.');
+    }
+    // Save the data in Firestore
+    const res = await db.collection('comments').doc(id).update({ comment });
+    // Return a success response
+    return {
+      success: true,
+      message: 'Document updated successfully.',
+    };
+  } catch (error) {
+    logger.error('Error updating comment:', error);
+    // Return an error response
+    return {
+      success: false,
+      message: 'Failed to update comment.',
+      error: error.message,
+    };
+  }
+});
+

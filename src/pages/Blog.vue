@@ -3,14 +3,18 @@
     import Nav from '@/components/Nav.vue'
     import { getFunctions, httpsCallable } from  'firebase/functions'
     import { ref, onMounted } from 'vue'
+    import { useLoading } from "vue-loading-overlay";
+    import "vue-loading-overlay/dist/css/index.css"; // Ensure the styles are included
 
     const handle = ref('')
     const comment = ref('')
     const comments = ref([])
+    const $loading = useLoading();
 
     const postComment = async () => {
         console.log("handle", handle.value);
         console.log("comment", comment.value);
+        let loader = $loading.show();
         const functions = getFunctions(app);
         const postComment = httpsCallable(functions, 'postcomment');
         const result = await postComment(
@@ -20,11 +24,12 @@
         });
         console.log(result);
         getComments()
+        loader.hide();
     }
 
     const getComments = async () => {
         const functions = getFunctions(app);
-        const getComments = httpsCallable(functions, 'getAllComments');
+        const getComments = httpsCallable(functions, 'getComments');
         const result = await getComments();
 
         comments.value = result.data.comments;
@@ -35,6 +40,21 @@
         getComments();
     })
 
+const deleteComment = async (id) => {
+    console.log("Deleting comment... ", id)
+    let loader = $loading.show();
+
+    const functions = getFunctions(app);
+    const deleteComment = httpsCallable(functions, 'deleteComment');
+
+    await deleteComment(
+        {
+            id: id
+        });
+
+    getComments();
+    loader.hide();
+    }
 
 </script>
 <template>
@@ -59,6 +79,9 @@
             <div class="mt-5" v-for="comment in comments">
                 {{comment.handle}} : 
                 {{ comment.comment }}
+
+        
+            <button type="button" @click="deleteComment(comment.id)" class="btn btn-danger">Delete Comment</button>
 
         </div>
         </div>
