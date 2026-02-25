@@ -106,6 +106,7 @@ exports.getComments = onCall(async (data, context) => {
     snapshot.docs.forEach(doc => {
       comments.push({
         id: doc.id,
+        likes: 1000,
         ...doc.data(),
       });
     });// Return the retrieved comments

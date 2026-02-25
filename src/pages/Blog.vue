@@ -1,7 +1,7 @@
 <script setup>
     import app from '../api/firebase'
     import Nav from '@/components/Nav.vue'
-    import { getFunctions, httpsCallable } from  'firebase/functions'
+    import { getFunctions, httpsCallable, connectFunctionsEmulator } from  'firebase/functions'
     import { ref, onMounted } from 'vue'
     import { useLoading } from "vue-loading-overlay";
     import "vue-loading-overlay/dist/css/index.css"; // Ensure the styles are included
@@ -10,12 +10,16 @@
     const comment = ref('')
     const comments = ref([])
     const $loading = useLoading();
+    const editingId = ref(null);
+    const tempValue = ref('');
 
     const postComment = async () => {
         console.log("handle", handle.value);
         console.log("comment", comment.value);
         let loader = $loading.show();
         const functions = getFunctions(app);
+        if (window.location.hostname === 'localhost') // Check if working locally
+            connectFunctionsEmulator(functions, "localhost", 5001);
         const postComment = httpsCallable(functions, 'postcomment');
         const result = await postComment(
         {
@@ -29,7 +33,10 @@
 
     const getComments = async () => {
         const functions = getFunctions(app);
-        const getComments = httpsCallable(functions, 'getComments');
+        if (window.location.hostname === 'localhost') // Check if working locally
+            connectFunctionsEmulator(functions, "localhost", 5001);
+
+        const getComments = httpsCallable(functions, 'getComments');        
         const result = await getComments();
 
         comments.value = result.data.comments;
@@ -40,11 +47,14 @@
         getComments();
     })
 
-const deleteComment = async (id) => {
+    const deleteComment = async (id) => {
     console.log("Deleting comment... ", id)
     let loader = $loading.show();
 
     const functions = getFunctions(app);
+    if (window.location.hostname === 'localhost') // Check if working locally
+        connectFunctionsEmulator(functions, "localhost", 5001);
+
     const deleteComment = httpsCallable(functions, 'deleteComment');
 
     await deleteComment(
@@ -55,6 +65,38 @@ const deleteComment = async (id) => {
     getComments();
     loader.hide();
     }
+
+    const enableEditing = (comment) => {
+        editingId.value = comment.id;
+        tempValue.value = comment.comment;
+    }
+
+    const disableEditing = () => {
+        editingId.value = null;
+        tempValue.value = null; 
+    }
+
+    const save = async (id) => {
+        console.log("Saving comment... ", id)
+        let loader = $loading.show();
+
+        const functions = getFunctions(app);
+        if (window.location.hostname === 'localhost') // Check if working locally
+            connectFunctionsEmulator(functions, "localhost", 5001);
+
+        const updateComment = httpsCallable(functions, 'updateComment');
+        await updateComment(
+            {
+                id: id,
+                comment: tempValue.value
+            });
+        getComments();
+        editingId.value = null;
+        tempValue.value = null;
+        loader.hide();
+}
+
+
 
 </script>
 <template>
@@ -76,14 +118,22 @@ const deleteComment = async (id) => {
                 <button type="button" @click="postComment" class="btn btn-primary">Post</button> 
             </div>
 
-            <div class="mt-5" v-for="comment in comments">
-                {{comment.handle}} : 
-                {{ comment.comment }}
-
-        
-            <button type="button" @click="deleteComment(comment.id)" class="btn btn-danger">Delete Comment</button>
-
-        </div>
+            <div class="mt-5" v-for="comment in comments" :key="comment.id">
+                {{ comment }}
+                <div v-if="editingId !== comment.id">
+                    <span @click="enableEditing(comment)">
+                        {{ comment.comment }}
+                        
+                    </span>
+               <button type="button" @click="deleteComment(comment.id)"
+                    class="btn btn-danger">Delete Comment</button>
+                </div>
+             <div v-else>
+                <input v-model="tempValue" class="form-control" />
+                 <button class="btn btn-primary" @click="disableEditing">Cancel</button>
+                 <button class="btn btn-success" @click="save(comment.id)">Save</button>
+             </div>
+            </div>
         </div>
 </template>
 
