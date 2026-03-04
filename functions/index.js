@@ -145,3 +145,15 @@ exports.updateComment = onCall(async (request) => {
   }
 });
 
+exports.secureFunction = onCall(async (request) => {
+  // context.auth contains information about the user, if they are logged in etc.    
+  console.log("auth", request.auth);
+
+  if (request.auth === undefined) {
+    //request is made from user that is logged in
+    return "User is not logged in"
+  } else {
+    return "User is logged in"
+  }
+});
+

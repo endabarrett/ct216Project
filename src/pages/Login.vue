@@ -1,20 +1,25 @@
 <script setup>
 import { ref } from 'vue';
 import app from "../api/firebase"
+import { useRouter } from 'vue-router'
 import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
 import { useLoading } from "vue-loading-overlay"
 import "vue-loading-overlay/dist/css/index.css"; // Ensure the styles are included
+
 const $loading = useLoading()
+const router = useRouter()
 const email = ref('');
 const password = ref('');
 const errorMessage = ref('')
 const auth = getAuth(app)
+
 const login = async () => {
     let loader = $loading.show();
     errorMessage.value = ''
     try {
         const userCredential = await signInWithEmailAndPassword(auth, email.value, password.value)
         const user = userCredential.user
+        router.push('/secure')
         console.log('Logged in user:', user)
     } catch (error) {
         errorMessage.value = error.message
