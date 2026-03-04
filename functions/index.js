@@ -52,9 +52,9 @@ setGlobalOptions({ maxInstances: 10 });
   }
 });*/
 
-exports.postcomment = onCall(async (data, context) => {
+exports.postcomment = onCall(async (request) => {
   try {
-    const { handle, comment } = data.data; logger.info("Received a comment post request", { handle, comment });
+    const { handle, comment } = request.data; logger.info("Received a comment post request", { handle, comment });
     if (!handle || !comment) {
       throw new Error('Missing handle or comment in request data.');
     }// Save the data in Firestore
@@ -68,9 +68,9 @@ exports.postcomment = onCall(async (data, context) => {
   }
 });
 
-exports.deleteComment = onCall(async (data, context) => {
+exports.deleteComment = onCall(async (request) => {
   try {
-    const { id } = data.data;
+    const { id } = request.data;
     logger.info("Received a delete comment request", { id });
     if (!id) {
       throw new Error('Missing document id request data.');
@@ -93,7 +93,7 @@ exports.deleteComment = onCall(async (data, context) => {
   }
 });
 
-exports.getComments = onCall(async (data, context) => {
+exports.getComments = onCall(async (request) => {
 
   try {
     // Query Firestore for the comments collection
@@ -120,9 +120,9 @@ exports.getComments = onCall(async (data, context) => {
 
 });
 
-exports.updateComment = onCall(async (data, context) => {
+exports.updateComment = onCall(async (request) => {
   try {
-    const { id, comment } = data.data;
+    const { id, comment } = request.data;
     logger.info("Received a comment update request", { comment });
     if (!comment) {
       throw new Error('Missing comment in request data.');
