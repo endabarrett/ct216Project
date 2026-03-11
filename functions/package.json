@@ -6,13 +6,15 @@
     "shell": "firebase functions:shell",
     "start": "npm run shell",
     "deploy": "firebase deploy --only functions",
-    "logs": "firebase functions:log"
+    "logs": "firebase functions:log",
+    "test": "mocha --reporter spec"
   },
   "engines": {
     "node": "22"
   },
   "main": "index.js",
   "dependencies": {
+    "chai": "^6.2.2",
     "firebase-admin": "^13.6.0",
     "firebase-functions": "^7.0.0"
   },

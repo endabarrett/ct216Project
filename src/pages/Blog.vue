@@ -5,6 +5,7 @@
     import { ref, onMounted } from 'vue'
     import { useLoading } from "vue-loading-overlay";
     import "vue-loading-overlay/dist/css/index.css"; // Ensure the styles are included
+    import { getAuth, onAuthStateChanged } from "firebase/auth"
 
     const handle = ref('')
     const comment = ref('')
@@ -12,6 +13,19 @@
     const $loading = useLoading();
     const editingId = ref(null);
     const tempValue = ref('');
+    const user = ref(null);
+
+    onMounted(() => {
+        const auth = getAuth(app)
+
+        onAuthStateChanged(auth, (firebaseUser) => {
+            user.value = firebaseUser
+            console.log("Logged in user:", firebaseUser.uid)
+        })
+
+        getComments()
+})
+
 
     const postComment = async () => {
         console.log("handle", handle.value);
@@ -42,10 +56,7 @@
         comments.value = result.data.comments;
 
     }
-
-    onMounted(() => {
-        getComments();
-    })
+    
 
     const deleteComment = async (id) => {
     console.log("Deleting comment... ", id)

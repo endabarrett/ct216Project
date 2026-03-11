@@ -58,7 +58,13 @@ exports.postcomment = onCall(async (request) => {
     if (!handle || !comment) {
       throw new Error('Missing handle or comment in request data.');
     }// Save the data in Firestore
-    const res = await db.collection('comments').add({ handle, comment }); logger.info('Document added with ID:', res.id);
+    let res;
+    if (!request.auth) {
+      res = await db.collection('comments').add({ handle, comment, uid: 'anonymous' });
+    }
+    else {
+      res = await db.collection('comments').add({ handle, comment, uid: request.auth.uid });
+    }
     // Return a success response
     return { success: true, message: 'Document added successfully.', documentId: res.id };
   } catch (error) {
