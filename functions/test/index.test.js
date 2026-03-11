@@ -2,8 +2,8 @@ const { assert } = require("chai");
 const { initializeApp } = require("firebase/app");
 const { getFunctions, httpsCallable, connectFunctionsEmulator } = require("firebase/functions");
 const firebaseConfig = {
-    apiKey: "AIzaSyBSowj34zyrON0XvLEBypatNBzBwVjhz7k",
-    authDomain: "ct216appamazing.firebaseapp.com",
+    apiKey: "<your API Key>",
+    authDomain: "<Your APP>",
     projectId: "ct216appamazing",
     storageBucket: "ct216appamazing.firebasestorage.app",
     messagingSenderId: "321257471324",
