@@ -28,5 +28,6 @@ export default [
         { path: '/register', component: loadPage('Registration') },
         { path: '/login', component: loadPage('Login') },
         { path: '/secure', component: loadPage('Secure'), beforeEnter: isAuth },
+        { path: '/upload', component: loadPage('Upload') }
 
 ]

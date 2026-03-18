@@ -6,7 +6,10 @@
     import { useLoading } from "vue-loading-overlay";
     import "vue-loading-overlay/dist/css/index.css"; // Ensure the styles are included
     import { getAuth, onAuthStateChanged } from "firebase/auth"
+    import { useStore } from '@/stores/store';
+    import Counter from '../components/Counter.vue'
 
+    const store = useStore();
     const handle = ref('')
     const comment = ref('')
     const comments = ref([])
@@ -145,6 +148,12 @@
                  <button class="btn btn-success" @click="save(comment.id)">Save</button>
              </div>
             </div>
+            <div>Counter {{ store.count }} <button type="button" @click="store.increment()" class="btn btn-primary">Click
+                Counter {{ store.count }}</button>
+            </div>
+            <br>
+            <br>
+            <Counter />
         </div>
 </template>
 
